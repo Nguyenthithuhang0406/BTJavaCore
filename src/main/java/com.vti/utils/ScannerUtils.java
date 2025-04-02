@@ -38,14 +38,15 @@ public class ScannerUtils {
     }
 
     public static Date inputDate() {
-        String dateStr = scanner.nextLine();
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
-        formatter.setLenient(false); // Chặn nhập ngày sai (VD: 2024-02-30)
-        try {
-            return formatter.parse(dateStr);
-        } catch (ParseException e) {
-            System.out.println("❌ Lỗi: Ngày sinh không hợp lệ. Định dạng đúng là yyyy-MM-dd.");
-            return null;
+        while (true){
+            String dateStr = inputString();
+            try {
+                SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+                return formatter.parse(dateStr);
+            } catch (Exception e) {
+                System.out.println("Ngày sinh không hợp lệ. Định dạng đúng là yyyy-MM-dd.");
+                return null;
+            }
         }
     }
 

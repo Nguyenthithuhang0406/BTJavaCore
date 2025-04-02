@@ -14,16 +14,19 @@ public class JdbcUtils {
             Class.forName(driver);
             Connection connection = DriverManager.getConnection(url, user, password);
 
-            if (connection != null) {
+            if(connection == null){
+                throw new RuntimeException("Ket noi that bai");
+            }
                 System.out.println("Ket noi thanh cong");
                 return connection;
-            } else {
-                System.out.println("Ket noi that bai");
-            }
-        }catch (Exception e){
+        }catch (ClassNotFoundException e){
+            throw new RuntimeException("Khong tim thay driver");
+        } catch (SQLException e){
+            throw new RuntimeException("Thong tin Ket noi SQL sai");
+        } catch (Exception e){
             System.err.println(e.getMessage());
+            throw new RuntimeException(e.getMessage());
         }
-        return null;
     }
 
     public static void closeConnection(Connection connection) {

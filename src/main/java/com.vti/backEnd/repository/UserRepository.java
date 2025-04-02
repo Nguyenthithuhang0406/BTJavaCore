@@ -11,11 +11,13 @@ import java.util.List;
 public class UserRepository {
     public User login(String username, String password){
         Connection connection = JdbcUtils.getConnection();
-        String sql = "SELECT * FROM `User` WHERE `user_name` = '" +  username + "'AND `password` = '" + password + "'";
+        String sql = "SELECT * FROM `User` WHERE `user_name` = ? AND `password` = ?";
 
         try {
-            Statement statement = connection.createStatement();
-            ResultSet resultSet = statement.executeQuery(sql);
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.setString(1, username);
+            preparedStatement.setString(2, password);
+            ResultSet resultSet = preparedStatement.executeQuery();
             if (resultSet.next()) {
                 User user = new User();
                 user.setId(resultSet.getInt("id"));
@@ -79,11 +81,12 @@ public class UserRepository {
 
     public User getUserById(int id){
         Connection connection = JdbcUtils.getConnection();
-        String sql = "SELECT * FROM `User` a JOIN `Department` b ON a.department_id = b.department_id WHERE a.id = " + id;
+        String sql = "SELECT * FROM `User` a JOIN `Department` b ON a.department_id = b.department_id WHERE a.id = ?";
 
         try {
-            Statement statement = connection.createStatement();
-            ResultSet resultSet = statement.executeQuery(sql);
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.setInt(1, id);
+            ResultSet resultSet = preparedStatement.executeQuery();
 
             if (resultSet.next()) {
                 User user = new User();
@@ -113,11 +116,13 @@ public class UserRepository {
 
     public User getUserByUserNameAndEmail(String value){
         Connection connection = JdbcUtils.getConnection();
-        String sql = "SELECT * FROM `User` a JOIN `Department` b ON a.department_id = b.department_id WHERE a.user_name = '" + value + "' OR a.email = '" + value + "'";
+        String sql = "SELECT * FROM `User` a JOIN `Department` b ON a.department_id = b.department_id WHERE a.user_name = ? OR a.email = ?";
 
         try {
-            Statement statement = connection.createStatement();
-            ResultSet resultSet = statement.executeQuery(sql);
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.setString(1, value);
+            preparedStatement.setString(2, value);
+            ResultSet resultSet = preparedStatement.executeQuery();
 
             if (resultSet.next()) {
                 User user = new User();
@@ -147,12 +152,17 @@ public class UserRepository {
 
     public void deleteUserById(int id){
         Connection connection = JdbcUtils.getConnection();
-        String sql = "DELETE FROM `User` WHERE id = " + id;
+        String sql = "DELETE FROM `User` WHERE id = ?";
 
         try {
-            Statement statement = connection.createStatement();
-            statement.executeUpdate(sql);
-            System.out.println("Xoa thanh cong");
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.setInt(1, id);
+            int count = preparedStatement.executeUpdate();
+            if (count > 0) {
+                System.out.println("Xoa thanh cong");
+            } else {
+                System.out.println("Khong tim thay user co id = " + id);
+            }
         } catch (SQLException e) {
             System.err.println(e.getMessage());
         } finally {
@@ -162,12 +172,18 @@ public class UserRepository {
 
     public void changePassword(int id, String newPassword){
         Connection connection = JdbcUtils.getConnection();
-        String sql = "UPDATE `User` SET `password` = '" + newPassword + "' WHERE id = " + id;
+        String sql = "UPDATE `User` SET `password` = ? WHERE id = ?";
 
         try {
-            Statement statement = connection.createStatement();
-            statement.executeUpdate(sql);
-            System.out.println("Doi mat khau thanh cong");
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.setString(1, newPassword);
+            preparedStatement.setInt(2, id);
+            int count = preparedStatement.executeUpdate();
+            if (count > 0) {
+                System.out.println("Doi mat khau thanh cong");
+            } else {
+                System.out.println("Khong tim thay user co id = " + id);
+            }
         } catch (SQLException e) {
             System.err.println(e.getMessage());
         } finally {
@@ -177,12 +193,22 @@ public class UserRepository {
 
     public void addUser(User user){
         Connection connection = JdbcUtils.getConnection();
-        String sql = "INSERT INTO `User`(`role`, `user_name`, `password`, `email`, `date_of_birth`, `department_id`) VALUES ('" + user.getRole().toString() + "', '" + user.getUserName() + "', '" + user.getPassword() + "', '" + user.getEmail() + "', '" + new java.sql.Date(user.getDate().getTime()) + "', " + user.getDepartmentId() + ")";
+        String sql = "INSERT INTO `User`(`role`, `user_name`, `password`, `email`, `date_of_birth`, `department_id`) VALUES (?, ?, ?, ?, ?, ?)";
 
         try {
-            Statement statement = connection.createStatement();
-            statement.executeUpdate(sql);
-            System.out.println("Them thanh cong");
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.setString(1, user.getRole().toString());
+            preparedStatement.setString(2, user.getUserName());
+            preparedStatement.setString(3, user.getPassword());
+            preparedStatement.setString(4, user.getEmail());
+            preparedStatement.setDate(5, new java.sql.Date(user.getDate().getTime()));
+            preparedStatement.setInt(6, user.getDepartmentId());
+            int count = preparedStatement.executeUpdate();
+            if (count > 0) {
+                System.out.println("Them user thanh cong");
+            } else {
+                System.out.println("Them user that bai");
+            }
         } catch (SQLException e) {
             System.err.println(e.getMessage());
         } finally {

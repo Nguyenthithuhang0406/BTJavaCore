@@ -10,6 +10,8 @@ public class UserController {
     private static UserService repository = new UserServiceImpl();
 
     public static User login(String userName, String password) {
+        //kiểm tra xem userName, password có rỗng không (controller)
+        // kiểm tra xem có tồn tại khum (service)
         return repository.login(userName, password);
     }
 
